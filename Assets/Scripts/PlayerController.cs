@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     public int RotateSpeed = 3;
 
     private bool _isCollidingGround;
+    private bool _hasDoubleJumped;
+
     private bool _isRotating;
     private int _degreeRemaining;
 
@@ -37,8 +39,13 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Space) && _isCollidingGround)
+            if (Input.GetKeyDown(KeyCode.Space) && (_isCollidingGround || !_hasDoubleJumped))
+            {
+                if (!_isCollidingGround) _hasDoubleJumped = true;
+
+                rigidbody.velocity = Vector3.zero;
                 rigidbody.AddForce(new Vector3(0f, JumpForce, 0f));
+            }
 
             if (Input.GetKeyDown(KeyCode.Q))
             {
@@ -58,7 +65,10 @@ public class PlayerController : MonoBehaviour
     void OnCollisionEnter(Collision c)
     {
         if (c.collider.tag == "Ground")
+        {
             _isCollidingGround = true;
+            _hasDoubleJumped = false;
+        }
     }
 
     void OnCollisionExit(Collision c)
